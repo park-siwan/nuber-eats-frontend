@@ -6,10 +6,11 @@ import {
   LoginMutation,
   LoginMutationVariables,
 } from '../__generated__/graphql';
-
+import nuberLogo from '../image/logo.svg';
+import Button from '../components/button';
 const LOGIN_MUTATION = gql`
-  mutation login($email: String!, $password: String!) {
-    login(input: { email: $email, password: $password }) {
+  mutation login($loginInput: LoginInput!) {
+    login(input: $loginInput) {
       ok
       token
       error
@@ -27,26 +28,47 @@ const Login = () => {
     register,
     getValues,
     handleSubmit,
-    formState: { errors },
-  } = useForm<LoginMutationVariables>();
-  const [loginMutation, { data }] = useMutation<LoginMutation>(LOGIN_MUTATION);
+    formState: { errors, isValid },
+  } = useForm<ILoginForm>({
+    mode: 'onChange',
+  });
+
+  const onCompleted = (data: LoginMutation) => {
+    const {
+      login: { ok, token },
+    } = data;
+    if (ok) {
+      console.log(token);
+    }
+  };
+
+  const [loginMutation, { data: loginMutationResult, loading }] =
+    useMutation<LoginMutation>(LOGIN_MUTATION, { onCompleted });
 
   const onSubmit = () => {
-    const { email, password } = getValues();
-    loginMutation({
-      variables: {
-        email,
-        password,
-      },
-    });
+    if (!loading) {
+      const { email, password } = getValues();
+      loginMutation({
+        variables: {
+          loginInput: {
+            email,
+            password,
+          },
+        },
+      });
+    }
   };
+
   return (
-    <div className="flex h-screen items-center justify-center bg-gray-800">
-      <div className="w-full max-w-lg rounded-lg bg-white pb-7 pt-10 text-center">
-        <h3 className="text-2xl text-gray-800">login</h3>
+    <div className="mt-10 flex h-screen flex-col items-center lg:mt-28">
+      <div className="flex w-full max-w-screen-sm flex-col items-center rounded-lg px-5">
+        <img src={nuberLogo} className="mb-10 w-52" alt="logo" />
+        <h4 className="m-5 w-full text-left text-3xl font-medium">
+          Welcome back
+        </h4>
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="mt-5 grid gap-3 px-5"
+          className="mb-5 mt-5 grid w-full gap-3"
         >
           <input
             placeholder="Email"
@@ -74,7 +96,11 @@ const Login = () => {
           {errors.password?.message && (
             <FormError errorMessage={errors.password?.message} />
           )}
-          <button className="btn mt-3">Log In</button>
+          {/* <button className="btn">{loading ? 'Loading...' : 'Log In'}</button> */}
+          <Button canClick={isValid} loading={loading} actionText="Log in" />
+          {loginMutationResult?.login.error && (
+            <FormError errorMessage={loginMutationResult?.login.error} />
+          )}
         </form>
       </div>
     </div>
