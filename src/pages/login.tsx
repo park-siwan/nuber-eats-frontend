@@ -8,6 +8,7 @@ import {
 } from '../__generated__/graphql';
 import nuberLogo from '../image/logo.svg';
 import Button from '../components/button';
+import { Link } from 'react-router-dom';
 const LOGIN_MUTATION = gql`
   mutation login($loginInput: LoginInput!) {
     login(input: $loginInput) {
@@ -102,6 +103,15 @@ const Login = () => {
             <FormError errorMessage={loginMutationResult?.login.error} />
           )}
         </form>
+        <div>
+          New to Nuber?{' '}
+          <Link
+            to={'/create-account'}
+            className="text-lime-600 hover:underline"
+          >
+            Crate an Account
+          </Link>
+        </div>
       </div>
     </div>
   );
