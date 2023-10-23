@@ -10,6 +10,7 @@ import nuberLogo from '../images/logo.svg';
 import Button from '../components/button';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
+import { isLoggedInVar } from '../apollo';
 const LOGIN_MUTATION = gql`
   mutation login($loginInput: LoginInput!) {
     login(input: $loginInput) {
@@ -41,6 +42,7 @@ const Login = () => {
     } = data;
     if (ok) {
       console.log(token);
+      isLoggedInVar(true);
     }
   };
 
@@ -80,7 +82,14 @@ const Login = () => {
             className="input"
             required
             type="email"
-            {...register('email', { required: 'Email is required' })}
+            {...register('email', {
+              required: 'Email is required',
+              pattern: {
+                value:
+                  /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                message: 'Please enter a valid email',
+              },
+            })}
           />
           {errors.email?.message && (
             <FormError errorMessage={errors.email?.message} />

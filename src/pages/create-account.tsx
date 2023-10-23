@@ -1,11 +1,18 @@
 import { gql, useMutation } from '@apollo/client';
 import React from 'react';
-import { UserRole } from '../__generated__/graphql';
+import {
+  CreateAccountInput,
+  CreateAccountMutation,
+  CreateAccountMutationVariables,
+  CreateAccountOutput,
+  MutationCreateAccountArgs,
+  UserRole,
+} from '../__generated__/graphql';
 import { useForm } from 'react-hook-form';
 import { Helmet } from 'react-helmet';
 import { FormError } from '../components/form-error';
 import Button from '../components/button';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import nuberLogo from '../images/logo.svg';
 
 const CREATE_ACCOUNT_MUTATION = gql`
@@ -23,7 +30,6 @@ interface ICreateAccountForm {
 }
 
 const CreateAccount = () => {
-  const [createAccount] = useMutation(CREATE_ACCOUNT_MUTATION);
   const {
     register,
     getValues,
@@ -36,8 +42,39 @@ const CreateAccount = () => {
       role: UserRole.Client,
     },
   });
-  const onSubmit = () => {};
-  console.log(watch());
+
+  const history = useHistory();
+
+  const onCompleted = (data: CreateAccountMutation) => {
+    const {
+      createAccount: { ok },
+    } = data;
+    if (ok) {
+      history.push('/login');
+    }
+  };
+
+  const [
+    createAccountMutation,
+    { loading, data: createAccountMutationResult },
+  ] = useMutation<CreateAccountMutation, CreateAccountMutationVariables>(
+    CREATE_ACCOUNT_MUTATION,
+    {
+      onCompleted,
+    },
+  );
+
+  const onSubmit = () => {
+    if (!loading) {
+      const { email, password, role } = getValues();
+      createAccountMutation({
+        variables: {
+          createAccountInput: { email, password, role },
+        },
+      });
+    }
+  };
+
   return (
     <div className="mt-10 flex h-screen flex-col items-center lg:mt-28">
       <Helmet>
@@ -53,7 +90,14 @@ const CreateAccount = () => {
           className="mb-5 mt-5 grid w-full gap-3"
         >
           <input
-            {...register('email', { required: 'Email is required' })}
+            {...register('email', {
+              required: 'Email is required',
+              pattern: {
+                value:
+                  /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                message: 'Please enter a valid email',
+              },
+            })}
             required
             type="email"
             placeholder="Email"
@@ -82,9 +126,14 @@ const CreateAccount = () => {
           </select>
           <Button
             canClick={isValid}
-            loading={false}
+            loading={loading}
             actionText={'Create Account'}
           />
+          {createAccountMutationResult?.createAccount?.error && (
+            <FormError
+              errorMessage={createAccountMutationResult.createAccount.error}
+            />
+          )}
         </form>
         <div>
           Already have an account?{' '}
