@@ -9,7 +9,7 @@ import {
   UserRole,
 } from '../__generated__/graphql';
 import { useForm } from 'react-hook-form';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import { FormError } from '../components/form-error';
 import Button from '../components/button';
 import { Link, useHistory } from 'react-router-dom';

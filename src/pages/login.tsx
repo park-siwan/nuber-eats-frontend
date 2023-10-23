@@ -9,8 +9,9 @@ import {
 import nuberLogo from '../images/logo.svg';
 import Button from '../components/button';
 import { Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
-import { isLoggedInVar } from '../apollo';
+import { Helmet } from 'react-helmet-async';
+import { authTokenVar, isLoggedInVar } from '../apollo';
+import { LOCALSTORAGE_TOKEN } from '../constatns';
 const LOGIN_MUTATION = gql`
   mutation login($loginInput: LoginInput!) {
     login(input: $loginInput) {
@@ -40,8 +41,9 @@ const Login = () => {
     const {
       login: { ok, token },
     } = data;
-    if (ok) {
-      console.log(token);
+    if (ok && token) {
+      localStorage.setItem(LOCALSTORAGE_TOKEN, token);
+      authTokenVar(token);
       isLoggedInVar(true);
     }
   };
