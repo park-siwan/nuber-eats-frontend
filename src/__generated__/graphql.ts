@@ -560,8 +560,7 @@ export type UserProfileOutput = {
 export enum UserRole {
   Client = 'Client',
   Delivery = 'Delivery',
-  Owner = 'Owner',
-  Siwan = 'siwan'
+  Owner = 'Owner'
 }
 
 export type VerifyEmailInput = {

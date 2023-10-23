@@ -101,10 +101,10 @@ const Login = () => {
             type="password"
             {...register('password', {
               required: 'Password is required',
-              minLength: {
-                value: 10,
-                message: 'Password must be more than 10 chars.',
-              },
+              // minLength: {
+              //   value: 10,
+              //   message: 'Password must be more than 10 chars.',
+              // },
             })}
           />
           {errors.password?.message && (
