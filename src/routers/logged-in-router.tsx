@@ -1,5 +1,4 @@
 import { gql, useQuery } from '@apollo/client';
-import { MeQuery } from '../__generated__/graphql';
 import {
   Redirect,
   Route,
@@ -8,24 +7,20 @@ import {
 } from 'react-router-dom';
 import { Restaurants } from '../pages/client/restaurants';
 import { Header } from '../components/header';
+import { useMe } from '../hooks/useMe';
+import { ConfirmEmail } from '../pages/user/confirm-email';
 
 const ClientRoutes = [
-  <Route path="/" exact>
+  <Route key={1} path="/" exact>
     <Restaurants />
   </Route>,
+  <Route key={2} path="/confirm" exact>
+    <ConfirmEmail />
+  </Route>,
 ];
-const ME_QUERY = gql`
-  query me {
-    me {
-      id
-      email
-      role
-      verified
-    }
-  }
-`;
+
 export const LoggedInRouter = () => {
-  const { data, loading, error } = useQuery<MeQuery>(ME_QUERY);
+  const { data, loading, error } = useMe();
   if (!data || loading || error) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -38,7 +33,7 @@ export const LoggedInRouter = () => {
       <Header />
       <Switch>
         {data.me.role === 'Client' && ClientRoutes}
-        <Redirect from="/potato" to="/" />
+        <Redirect to="/" />
       </Switch>
     </Router>
   );
