@@ -7,6 +7,7 @@ import {
   EditProfileMutationVariables,
 } from '../../__generated__/graphql';
 import { useForm } from 'react-hook-form';
+import { Helmet } from 'react-helmet-async';
 
 const EDIT_PROFILE_MUTATION = gql`
   mutation editProfile($input: EditProfileInput!) {
@@ -76,6 +77,9 @@ export const EditProfile = () => {
   };
   return (
     <div className="mt-52 flex flex-col items-center justify-center">
+      <Helmet>
+        <title>Edit Profile | Nuber Eats</title>
+      </Helmet>
       <h4 className="mb-3 text-2xl font-semibold">Edit Profile</h4>
       <form
         onSubmit={handleSubmit(onSubmit)}
